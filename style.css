@@ -1,0 +1,19 @@
+.node {
+    cursor: pointer;
+}
+
+.link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
+  }
+.node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 3px;
+  }
+  let hoverCircleNodeClass {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1px;
+}
