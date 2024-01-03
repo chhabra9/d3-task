@@ -9,6 +9,10 @@
             <link rel="stylesheet" href="style.css">
             </head>
             <body>
+              <button onClick="Call()">click</button>
+              <div class="zoom-slider">
+                <input type="range" min=".5" max="20" value=".5" step="0.09" id="zoomRange" onChange="changeSize">
+              </div>
               <script src="./index.js"></script>
               <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
             </body>

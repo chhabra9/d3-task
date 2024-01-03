@@ -1,8 +1,8 @@
 
-$(document).ready(() => {
+
     let dim = {
-        height: window.screen.height,
-        width: window.screen.width * 1.5,
+        height:800,
+        width: window.screen.width ,
     }
     let margin = {
         top: 30,
@@ -20,37 +20,75 @@ $(document).ready(() => {
         y: 13
     }
     let duration = 800
-    $.ajax({
-        url: 'data.json',
-        datatype: 'json',
-        success: (data) => {
-            data.treeData[0].startPoint = dim.height / 2;
-            createTree(data.treeData[0]);
+    function Call(){
+        $.ajax({
+            url: 'data.json',
+            datatype: 'json',
+            success: (data) => {
+                data.treeData[0].startPoint = dim.height / 2;
+                createTree(data.treeData[0]);
+    
+            }
+        });
+    }
+    function getMaxDepthIterative(root) {
+        const stack = [{ node: root, depth: 0 }];
+        let maxDepth = 0;
 
+        while (stack.length > 0) {
+            const { node, depth } = stack.pop();
+
+            if (depth > maxDepth) {
+                maxDepth = depth;
+            }
+
+            if (node.children) {
+                for (const child of node.children) {
+                    stack.push({ node: child, depth: depth + 1 });
+                }
+            }
         }
-    });
 
+        return maxDepth;
+    }
+    let svg;
     createTree = (data) => {
-        let tree = d3.layout.tree().nodeSize([20, 30]).size([
+       let depth=  getMaxDepthIterative(data)*50
+       let tree = d3.layout.tree().nodeSize([20, 30]).size([
             dim.height - margin.top - margin.bottom, dim.width - margin.left - margin.right
         ]);
 
         let nodes = tree.nodes(data).reverse();
         let links = tree.links(nodes);
         let diagonal = d3.svg.diagonal().projection((d) => [d.y, d.x]);
-        nodes.forEach((d) => d.y = d.depth * 110);
+        nodes.forEach((d) => d.y = d.depth * depth);
+        let zoom = d3.behavior.zoom().scaleExtent([0.5,20]).on("zoom", zoomed)
+        zoomRange.addEventListener("input", function() {
+            const scale = +this.value;
+            svg.attr("transform",
+            "translate(" + 0 + ")"
+            + " scale(" +scale + ")");
+          });
+          d3.select("body svg").remove();
 
-        let svg = d3.select("body").
+         svg = d3.select("body").
             append("svg").
             attr("width", dim.width).
             attr("height", dim.height).
+            call(zoom).
             append("g").
             attr("transform", `translate(${margin.left},${margin.right})`);
+            d3.select("#zoom_in").on("click", function() {
+                zoom.scaleBy(svg.transition().duration(750), 1.2);
+              });
+              d3.select("#zoom_out").on("click", function() {
+                zoom.scaleBy(svg.transition().duration(750), 0.8);
+              });
 
         let i = 0;
 
         let nodeData = svg.selectAll("g.node").data(nodes, (d) => d.id || (d.id = ++i));
-
+        nodeData.exit().remove();
         var nodeEnter = nodeData.enter().append("g")
             .attr("class", "node")
             .attr("transform", (d) => `translate(0,${data.startPoint})`)
@@ -203,4 +241,10 @@ $(document).ready(() => {
             .duration(duration)
             .attr("d", diagonal);
     }
-})
+
+    function zoomed() {
+        console.log("calling")
+        svg.attr("transform", "translate(" + d3.event.translate + ")");
+      }
+
+

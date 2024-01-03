@@ -17,3 +17,6 @@
     stroke: steelblue;
     stroke-width: 1px;
 }
+body{
+  overflow: hidden;
+}
